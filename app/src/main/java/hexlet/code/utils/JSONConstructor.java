@@ -20,31 +20,29 @@ public class JSONConstructor {
             return;
         }
 
+        if (fileValue1 != null && fileValue2 != null) {
+            if (!fileValue1.equals(fileValue2)) {
+                ObjectNode node1 = constructNode("- " + fieldName, fileValue1);
+                ObjectNode node2 = constructNode("+ " + fieldName, fileValue2);
+                rootNode.setAll(node1);
+                rootNode.setAll(node2);
+                return;
+            }
+        }
+
+        Object nodeValue = fileValue1;
+
         if (fileValue2 == null) {
-            String formatted = "- %s" + fieldName;
-            ObjectNode node = constructNode(formatted, fileValue1);
-            rootNode.setAll(node);
-            return;
+            fieldName = "- " + fieldName;
         }
 
         if (fileValue1 == null) {
-            String formatted = "+ %s" + fieldName;
-            ObjectNode node = constructNode(formatted, fileValue2);
-            rootNode.setAll(node);
-            return;
+            fieldName = "+ " + fieldName;
+            nodeValue = fileValue2;
         }
 
-        if (!fileValue1.equals(fileValue2)) {
-            String formatted1 = "- %s" + fieldName;
-            String formatted2 = "+ %s" + fieldName;
-            ObjectNode node1 = constructNode(formatted1, fileValue1);
-            ObjectNode node2 = constructNode(formatted2, fileValue2);
-            rootNode.setAll(node1);
-            rootNode.setAll(node2);
-            return;
-        }
 
-        ObjectNode node = constructNode(fieldName, fileValue1);
+        ObjectNode node = constructNode(fieldName, nodeValue);
         rootNode.setAll(node);
     }
 
