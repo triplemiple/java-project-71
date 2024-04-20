@@ -11,6 +11,11 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
+}
+
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
     implementation("info.picocli:picocli:4.7.5")
@@ -20,7 +25,7 @@ dependencies {
 }
 
 application {
-   mainClass = "hexlet.code.App"
+    mainClass = "hexlet.code.App"
 }
 
 tasks.test {

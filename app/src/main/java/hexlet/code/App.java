@@ -1,19 +1,16 @@
 package hexlet.code;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import hexlet.code.utils.FileUtils;
+import hexlet.code.utils.JSONConstructor;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -32,20 +29,8 @@ public class App implements Callable<Integer> {
 
     @Override
     public Integer call() throws IOException {
-        Path path1 = Path.of(filepath1).normalize().toAbsolutePath();
-        Path path2 = Path.of(filepath2).normalize().toAbsolutePath();
-        String file1;
-        String file2;
-
-        file1 = Files.readString(path1);
-        file2 = Files.readString(path2);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        HashMap<String, Object> map1 = objectMapper.readValue(file1, new TypeReference<>() {
-        });
-
-        HashMap<String, Object> map2 = objectMapper.readValue(file2, new TypeReference<>() {
-        });
+        Map<String, Object> map1 = FileUtils.getData(filepath1);
+        Map<String, Object> map2 = FileUtils.getData(filepath1);
 
         Set<String> keys1 = map1.keySet();
         Set<String> keys2 = map2.keySet();
@@ -54,52 +39,16 @@ public class App implements Callable<Integer> {
         mergedKeys.addAll(Set.copyOf(keys2));
 
         List<String> sortedKeys = mergedKeys.stream().sorted().toList();
+        JSONConstructor constructor = new JSONConstructor();
 
-        ObjectNode root = objectMapper.createObjectNode();
+        sortedKeys.forEach(key -> {
+            Object value1 = map1.getOrDefault(key, null);
+            Object value2 = map1.getOrDefault(key, null);
 
-        for (String key : sortedKeys) {
-            Object firstValue = map1.getOrDefault(key, null);
-            Object secondValue = map2.getOrDefault(key, null);
+            constructor.addNodeToRoot(key, value1, value2);
+        });
 
-            if (firstValue != null && secondValue == null) {
-                ObjectNode node = objectMapper.createObjectNode();
-                String formatted = String.format("- %s", key);
-                Object fileValue = map1.get(key);
-                node.set(formatted, objectMapper.valueToTree(fileValue));
-                root.setAll(node);
-            }
-
-            if (firstValue == null && secondValue != null) {
-                ObjectNode node = objectMapper.createObjectNode();
-                String formatted = String.format("+ %s", key);
-                Object fileValue = map2.get(key);
-                node.set(formatted, objectMapper.valueToTree(fileValue));
-                root.setAll(node);
-            }
-
-            if (firstValue != null && secondValue != null) {
-                if (firstValue.equals(secondValue)) {
-                    ObjectNode node = objectMapper.createObjectNode();
-                    Object fileValue = map2.get(key);
-                    node.set(key, objectMapper.valueToTree(fileValue));
-                    root.setAll(node);
-                } else {
-                    ObjectNode node1 = objectMapper.createObjectNode();
-                    ObjectNode node2 = objectMapper.createObjectNode();
-                    String formatted1 = String.format("- %s", key);
-                    String formatted2 = String.format("+ %s", key);
-                    Object fileValue1 = map1.get(key);
-                    Object fileValue2 = map2.get(key);
-                    node1.set(formatted1, objectMapper.valueToTree(fileValue1));
-                    node2.set(formatted2, objectMapper.valueToTree(fileValue2));
-                    root.setAll(node1);
-                    root.setAll(node2);
-                }
-            }
-        }
-
-        String output = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        System.out.println(output);
+        System.out.println(constructor.getJSONString());
 
         return 0;
     }
