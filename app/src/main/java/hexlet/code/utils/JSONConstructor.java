@@ -16,14 +16,12 @@ public class JSONConstructor {
     }
 
     public void addNodeToRoot(String fieldName, Object fileValue1, Object fileValue2) {
-        if (fileValue1 == null && fileValue2 == null) {
-            return;
-        }
-
         if (fileValue1 != null && fileValue2 != null) {
             if (!fileValue1.equals(fileValue2)) {
-                ObjectNode node1 = constructNode("- " + fieldName, fileValue1);
-                ObjectNode node2 = constructNode("+ " + fieldName, fileValue2);
+                String formatted1 = "- " + fieldName;
+                String formatted2 = "- " + fieldName;
+                ObjectNode node1 = constructNode(formatted1, fileValue1);
+                ObjectNode node2 = constructNode(formatted2, fileValue2);
                 rootNode.setAll(node1);
                 rootNode.setAll(node2);
                 return;
@@ -40,7 +38,6 @@ public class JSONConstructor {
             fieldName = "+ " + fieldName;
             nodeValue = fileValue2;
         }
-
 
         ObjectNode node = constructNode(fieldName, nodeValue);
         rootNode.setAll(node);
