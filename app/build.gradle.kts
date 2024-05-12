@@ -2,6 +2,8 @@ plugins {
     id("java")
     id("application")
     id("checkstyle")
+    id("jacoco")
+    id("com.adarshr.test-logger").version("4.0.0")
 }
 
 group = "hexlet.code"
@@ -30,9 +32,9 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.compileJava {
     options.release = 20
 }
-
