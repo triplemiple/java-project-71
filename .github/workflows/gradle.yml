@@ -35,5 +35,5 @@ jobs:
         build-root-directory: app/
         
     - name: Build with Gradle
-    - run: ./gradlew build
-      working-directory: ./app/
+      run: ./gradlew build
+      working-directory: /app/
